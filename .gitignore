@@ -1,0 +1,28 @@
+ # Ignorar arquivos de cache e ambientes virtuais Python
+ __pycache__/
+ *.pyc
+ *.pyo
+ *.pyd
+ .Python
+ env/
+ venv/
+ *.egg-info/
+ .pytest_cache/
+ # Ignorar dependências do Node.js (frontend)
+ node_modules/
+ # Ignorar arquivos de log
+ *.log
+ # Ignorar arquivos de configuração sensíveis (ex: chaves de API)
+ *.env
+ .env.local
+ # Ignorar arquivos de sistema operacional
+ .DS_Store
+ Thumbs.db
+ # Ignorar arquivos de dados grandes ou gerados
+ /data/*.csv
+ /data/*.json
+ # Ignorar arquivos de build do frontend
+ /frontend/build/
+ /frontend/dist/
+ # Ignorar arquivos de teste gerados
+ /tests/coverage/
