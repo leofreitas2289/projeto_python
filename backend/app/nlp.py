@@ -11,7 +11,7 @@ try:
     nlp = spacy.load("pt_core_news_sm")
 
 except OSError:
-    print("Modelo 'pt_core_web_sm' não encontrado. "
+    print("Modelo \'pt_core_web_sm\' não encontrado. "
           "Por favor, execute o comando de instalação do modelo novamente.")
     nlp = None
 
@@ -46,7 +46,8 @@ def analisar_descricao_processo(texto: str):
 
     return {
         "entidades_nomeadas": entidades,
-        "tokens": tokens_e_lemas
+        "tokens": tokens_e_lemas,
+        "texto_original": texto # Adicionando o texto original aqui
     }
 
 # O bloco a seguir só será executado quando rodarmos este arquivo diretamente
@@ -56,11 +57,12 @@ if __name__ == "__main__":
     exemplo_texto = ("O colaborador João da Silva, da empresa Acme Corp, iniciou o processo de "
                      "aprovação de fatura no valor de R$ 1.500,00 em São Paulo.")
     
-    print(f"--- Analisando o texto: '{exemplo_texto}' ---")
+    print(f"--- Analisando o texto: \'{exemplo_texto}\' ---")
     
     resultado_analise = analisar_descricao_processo(exemplo_texto)
     
     # Imprime o resultado de forma legível (JSON formatado)
     print("\n--- Resultado da Análise ---")
     print(json.dumps(resultado_analise, indent=2, ensure_ascii=False))
+
 

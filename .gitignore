@@ -26,3 +26,15 @@
  /frontend/dist/
  # Ignorar arquivos de teste gerados
  /tests/coverage/
+
+# Frontend specific ignores
+.vite/
+
+# Database files
+*.sqlite3
+*.db
+
+# Uploads directory
+uploads/
+
+
