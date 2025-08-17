@@ -13,7 +13,8 @@ import {
   DollarSign,
   Clock,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Pencil
 } from 'lucide-react'
 import axios from 'axios'
 
@@ -26,17 +27,50 @@ const ProcessDetail = () => {
   const [analysis, setAnalysis] = useState(null)
   const [loading, setLoading] = useState(true)
   const [analyzing, setAnalyzing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedTitle, setEditedTitle] = useState('')
+  const [editedDescription, setEditedDescription] = useState('')
+  const handleSaveEdit = async () => {
+    try {
+      const response = await axios.put(`/api/processes/${id}`, {
+        title: editedTitle,
+        description: editedDescription,
+      });
+      setProcess(response.data);
+      setIsEditing(false);
+      alert("Processo atualizado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar processo:", error);
+      alert("Erro ao salvar processo. Tente novamente.");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedTitle(process.title);
+    setEditedDescription(process.description);
+  };
 
   useEffect(() => {
-    fetchProcess()
-  }, [id])
+    fetchProcess();
+  }, [id]);
+
+  useEffect(() => {
+    if (process) {
+      setEditedTitle(process.title);
+      setEditedDescription(process.description);
+    }
+  }, [process]);
 
   const fetchProcess = async () => {
+    console.log('Fetching process with ID:', id)
     try {
       const response = await axios.get(`/api/processes/${id}`)
+      console.log('Process fetched successfully:', response.data)
       setProcess(response.data)
     } catch (error) {
       console.error('Erro ao buscar processo:', error)
+      console.error('Error response:', error.response)
       if (error.response?.status === 404) {
         navigate('/dashboard')
       }
@@ -46,12 +80,15 @@ const ProcessDetail = () => {
   }
 
   const analyzeProcess = async () => {
+    console.log('Analyzing process with ID:', id)
     setAnalyzing(true)
     try {
       const response = await axios.post(`/api/processes/${id}/analyze`)
+      console.log('Analysis completed successfully:', response.data)
       setAnalysis(response.data)
     } catch (error) {
       console.error('Erro ao analisar processo:', error)
+      console.error('Error response:', error.response)
       alert('Erro ao analisar processo. Tente novamente.')
     } finally {
       setAnalyzing(false)
@@ -162,6 +199,13 @@ const ProcessDetail = () => {
               </div>
             </div>
             <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              <Pencil className="h-4 w-4" />
+              <span>Editar Processo</span>
+            </button>
+            <button
               onClick={analyzeProcess}
               disabled={analyzing}
               className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
@@ -185,24 +229,65 @@ const ProcessDetail = () => {
               </div>
               
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Título
-                  </label>
-                  <p className="text-gray-900">{process.title}</p>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Descrição
-                  </label>
-                  <div className="bg-gray-50 rounded-md p-4">
-                    <p className="text-gray-900 whitespace-pre-wrap">
-                      {process.description || 'Sem descrição'}
-                    </p>
-                  </div>
-                </div>
-                
+                {isEditing ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Título
+                      </label>
+                      <input
+                        type="text"
+                        value={editedTitle}
+                        onChange={(e) => setEditedTitle(e.target.value)}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Descrição
+                      </label>
+                      <textarea
+                        value={editedDescription}
+                        onChange={(e) => setEditedDescription(e.target.value)}
+                        rows="5"
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      ></textarea>
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <button
+                        onClick={handleSaveEdit}
+                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                      >
+                        Salvar
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Título
+                      </label>
+                      <p className="text-gray-900">{process.title}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Descrição
+                      </label>
+                      <div className="bg-gray-50 rounded-md p-4">
+                        <p className="text-gray-900 whitespace-pre-wrap">
+                          {process.description || 'Sem descrição'}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -310,4 +395,3 @@ const ProcessDetail = () => {
 }
 
 export default ProcessDetail
-

@@ -201,24 +201,3 @@ def analyze_process_description(
     return resposta_completa
 
 
-
-
-
-
-@app.get("/processes/{process_id}", response_model=schemas.Process)
-def read_single_process(
-    process_id: int,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_user)
-):
-    """
-    Retorna um processo específico pelo seu ID, pertencente ao usuário autenticado.
-    """
-    db_process = db.query(models.Process).filter(models.Process.id == process_id).first()
-    if db_process is None:
-        raise HTTPException(status_code=404, detail="Process not found")
-    if db_process.owner_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to access this process")
-    return db_process
-
-
